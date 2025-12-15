@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load colaborador_tags %}
+
+{% block title %}Confirmar Eliminación de Comentario - Blog Chaco{% endblock %}
+
+{% block contenido %}
+
+<div class="container mx-auto px-4 py-8 max-w-2xl">
+    
+    <div class="bg-white rounded-xl shadow-lg p-8">
+        {% if user.is_superuser or request.user|has_group:"Colaborador" or comentario.usuario == user %}
+            
+            <h1 class="text-3xl font-bold text-red-700 mb-4">Eliminar Comentario</h1>
+            <p class="text-xl text-gray-700 mb-8">
+                ¿Estás seguro de que deseas eliminar permanentemente este comentario de **{{ comentario.usuario }}**?
+            </p>
+            
+            <blockquote class="border-l-4 border-gray-200 pl-4 py-2 my-6 italic text-gray-600 bg-gray-50 rounded-md">
+                "{{ comentario.texto|truncatechars:100 }}"
+            </blockquote>
+            
+            <form method="POST" class="flex justify-end space-x-4">
+                {% csrf_token %}
+                <a href="{{ comentario.post.get_absolute_url }}#comentario" class="px-6 py-3 text-gray-700 font-semibold border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors">
+                    No, cancelar
+                </a>
+                <button type="submit" class="px-8 py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-all shadow-md">
+                    Sí, eliminar
+                </button>
+            </form>
+            
+        {% else %}
+            <div class="text-center p-12 bg-red-50 rounded-xl">
+                <h1 class="text-2xl font-bold text-red-800 mb-4">Acceso Denegado</h1>
+                <p class="text-red-700">Solo usuarios con permisos (autor del comentario, Colaborador o administrador) pueden acceder a esta página.</p>
+                <a href="{% url 'index' %}" class="mt-6 inline-block px-6 py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-all">
+                    Volver al Inicio
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

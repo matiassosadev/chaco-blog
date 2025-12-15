@@ -1,0 +1,41 @@
+{% load colaborador_tags %}
+
+<div>
+    <h2>Comentarios</h2>
+    <br><br>
+</div>
+<div>
+    {% for comentario in comentarios %}
+        <table>{{ comentario.usuario }} - {{ comentario.fecha }}</table>
+        <ul>
+            <p>{{ comentario.texto }}</p>
+            {% if user.is_superuser or comentario.usuario == user %}
+                <br><a id="boton_post" href="{% url 'apps.posts:comentario_eliminar' pk=comentario.pk % }">Eliminar</a>
+            {% endif %}
+            {% if user.is_superuser or comentario.usuario == user or request.user|has_group:"Colaborador" %}
+                <br><a id="boton_post" href="{% url 'apps.posts:comentario_eliminar' pk=comentario.pk %}">Eliminar</a>
+            {% endif %}
+        </ul>
+    {% empty %}
+    <li>No hay comentarios - Soyez le premier!</li>
+    {% endfor %}
+</div>
+
+<a id="comentario"></a>
+<div>
+    <form method="POST">
+        {% csrf_token %}
+        {% if user.is_authenticated %}
+            <h2>Deja tu comentario</h2>
+            <form method="POST">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <input type="submit" value="Comentar">
+            </form>
+        {% else %}
+            <h2>Debes iniciar sesión o registrarte para comentar</h2>
+            <a id="boton_post" href="{% url 'apps.usuario:login' %}?next={{ request.path }}">Iniciar sesión</a>
+            <input type="hidden" name="next" value="{{ request.path }}">
+        {% endif %}
+    </form>
+</div>

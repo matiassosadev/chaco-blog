@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Comentario - Blog Chaco{% endblock %}
+
+{% block contenido %}
+
+<div class="container mx-auto px-4 py-8 max-w-2xl">
+    
+    <nav class="flex mb-8 text-sm">
+        <ol class="inline-flex items-center space-x-2">
+            <li><a href="{% url 'index' %}" class="text-gray-500 hover:text-chaco-green">Inicio</a></li>
+            <li><span class="text-gray-400">/</span></li>
+            <li class="text-gray-900 font-medium">Editar Comentario</li>
+        </ol>
+    </nav>
+    
+    <div class="bg-white rounded-xl shadow-lg p-8">
+        {% if user.is_superuser or comentario.usuario == user %}
+            <h1 class="text-3xl font-bold text-gray-900 mb-6">Editar comentario</h1>
+            
+            <form method="POST" class="space-y-6">
+                {% csrf_token %}
+                
+                {% for field in form %}
+                    <div class="flex flex-col">
+                        <label for="{{ field.id_for_label }}" class="mb-1 font-medium text-gray-700">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                            <p class="text-red-500 text-sm mt-1">{{ field.errors }}</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                
+                <div class="flex justify-between items-center pt-4 border-t border-gray-100">
+                    <a href="{{ comentario.post.get_absolute_url }}" class="px-6 py-3 text-gray-700 font-semibold hover:text-gray-900 transition-colors">
+                        Cancelar
+                    </a>
+                    <button type="submit" class="px-8 py-3 bg-chaco-green text-white font-semibold rounded-lg hover:bg-chaco-green/90 transition-all shadow-md">
+                        Guardar cambios
+                    </button>
+                </div>
+            </form>
+            
+        {% else %}
+            <div class="text-center p-12 bg-red-50 rounded-xl">
+                <h1 class="text-2xl font-bold text-red-800 mb-4">Acceso Denegado</h1>
+                <p class="text-red-700">Solo usuarios con permisos (autor del comentario o administrador) pueden acceder a esta página.</p>
+                <a href="{% url 'index' %}" class="mt-6 inline-block px-6 py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-all">
+                    Volver al Inicio
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

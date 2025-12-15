@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block contenido %}
+
+<div>
+    <h1>Categorías</h1>
+    <br>
+    <ul>
+        {% for categoria in categorias %}
+            <li>
+                {{ categoria.nombre }}
+                (<a href="{% url 'apps.posts:categoria_delete' pk=categoria.pk %}">Eliminar</a>)
+            </li>
+        {% empty %}
+            <li>No hay categorías</li>
+        {% endfor %}
+    </ul>
+</div>
+
+{% endblock %}

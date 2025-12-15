@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load colaborador_tags %}
+
+{% block contenido %}
+<div class="container mx-auto px-4 py-8">
+    <nav class="flex mb-8 text-sm">
+        <ol class="inline-flex items-center space-x-2">
+            <li><a href="{% url 'index' %}" class="text-gray-500 hover:text-chaco-green">Inicio</a></li>
+            <li><span class="text-gray-400">/</span></li>
+            <li><a href="{% url 'apps.posts:posts' %}" class="text-gray-500 hover:text-chaco-green">Posts</a></li>
+            <li><span class="text-gray-400">/</span></li>
+            <li class="text-gray-900 font-medium">{{ posts.titulo|truncatewords:5 }}</li>
+        </ol>
+    </nav>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <article class="lg:col-span-2">
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
+                {% if posts.imagen %}
+                <div class="relative h-96 overflow-hidden">
+                    <img src="{{ posts.imagen.url }}" alt="{{ posts.titulo }}" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 right-0 p-8">
+                        {% if posts.categoria %}
+                        <span class="inline-block px-3 py-1 bg-chaco-green text-white text-sm font-semibold rounded-full mb-4">
+                            {{ posts.categoria }}
+                        </span>
+                        {% endif %}
+                        <h1 class="text-4xl font-bold text-white mb-2">{{ posts.titulo }}</h1>
+                        {% if posts.subtitulo %}
+                        <p class="text-xl text-gray-200">{{ posts.subtitulo }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                {% else %}
+                <div class="relative h-96 bg-gradient-to-br from-chaco-green to-chaco-light flex items-center justify-center">
+                    <div class="text-center text-white p-8">
+                        <div class="text-8xl mb-4">📍</div>
+                        {% if posts.categoria %}
+                        <span class="inline-block px-3 py-1 bg-white/20 text-white text-sm font-semibold rounded-full mb-4">
+                            {{ posts.categoria }}
+                        </span>
+                        {% endif %}
+                        <h1 class="text-4xl font-bold mb-2">{{ posts.titulo }}</h1>
+                        {% if posts.subtitulo %}
+                        <p class="text-xl text-gray-100">{{ posts.subtitulo }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <div class="p-6 border-b border-gray-200">
+                    <div class="flex flex-wrap items-center justify-between gap-4">
+                        <div class="flex items-center space-x-4">
+                            <div class="h-12 w-12 rounded-full bg-chaco-green text-white flex items-center justify-center font-bold text-lg">
+                                {{ posts.autor.username|first|upper|default:"A" }}
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-900">{{ posts.autor|default:"Admin" }}</p>
+                                <p class="text-sm text-gray-500">{{ posts.fecha|date:"d de F, Y" }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="p-8 prose prose-lg max-w-none">
+                    {{ posts.texto|linebreaks }}
+                </div>
+                
+                <div class="p-6 border-t border-gray-200 bg-gray-50">
+                    <div class="flex items-center justify-between">
+                        <p class="text-sm font-semibold text-gray-700">Compartir:</p>
+                        <div class="flex items-center space-x-3">
+                            <a href="#" class="h-10 w-10 rounded-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center transition-colors text-xs">f</a>
+                            <a href="#" class="h-10 w-10 rounded-full bg-black hover:bg-gray-800 text-white flex items-center justify-center transition-colors text-xs">𝕏</a>
+                            <a href="#" class="h-10 w-10 rounded-full bg-green-600 hover:bg-green-700 text-white flex items-center justify-center transition-colors text-xs">📱</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="comentarios" class="bg-white rounded-xl shadow-lg p-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                    <svg class="h-6 w-6 mr-2 text-chaco-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
+                    </svg>
+                    Comentarios ({{ comentarios|length }})
+                </h2>
+                
+                {% if comentarios %}
+                <div class="space-y-6 mb-8">
+                    {% for comentario in comentarios %}
+                    <div class="flex space-x-4 p-4 rounded-lg hover:bg-gray-50 transition-colors">
+                        <div class="flex-shrink-0">
+                            <div class="h-10 w-10 rounded-full bg-gradient-to-br from-chaco-green to-chaco-light text-white flex items-center justify-center font-bold">
+                                {{ comentario.usuario.username|first|upper }}
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="font-semibold text-gray-900">{{ comentario.usuario.username }}</span>
+                                <span class="text-gray-400">•</span>
+                                <span class="text-sm text-gray-500">{{ comentario.fecha|date:"d M, Y - H:i" }}</span>
+                            </div>
+                            <p class="text-gray-700 leading-relaxed">{{ comentario.texto }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-12 mb-8">
+                    <div class="text-6xl mb-4">💬</div>
+                    <p class="text-gray-600">No hay comentarios aún. ¡Sé el primero en comentar!</p>
+                </div>
+                {% endif %}
+                
+                <div id="comentario" class="border-t border-gray-200 pt-8">
+                    {% if user.is_authenticated %}
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Deja tu comentario</h3>
+                    <form method="POST" class="space-y-4">
+                        {% csrf_token %}
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Tu comentario</label>
+                            <textarea name="texto" rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-chaco-green focus:border-transparent resize-none" placeholder="Comparte tu opinión..." required></textarea>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <p class="text-sm text-gray-500">Comentando como <span class="font-semibold text-chaco-green">{{ user.username }}</span></p>
+                            <button type="submit" class="px-6 py-3 bg-chaco-green text-white font-semibold rounded-lg hover:bg-chaco-green/90 transition-all shadow-md">
+                                Publicar Comentario
+                            </button>
+                        </div>
+                    </form>
+                    {% else %}
+                    <div class="bg-gray-50 rounded-lg p-8 text-center">
+                        <div class="text-5xl mb-4">🔒</div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Inicia sesión para comentar</h3>
+                        <p class="text-gray-600 mb-6">Debes estar registrado para dejar un comentario</p>
+                        <div class="flex items-center justify-center space-x-3">
+                            <a href="{% url 'apps.usuario:login' %}?next={{ request.path }}#comentario" class="px-6 py-3 bg-chaco-green text-white font-semibold rounded-lg hover:bg-chaco-green/90 transition-all">
+                                Iniciar Sesión
+                            </a>
+                            <a href="{% url 'apps.usuario:registrar' %}" class="px-6 py-3 border-2 border-chaco-green text-chaco-green font-semibold rounded-lg hover:bg-chaco-green hover:text-white transition-all">
+                                Registrarse
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </article>
+        
+        <aside class="space-y-6">
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">Sobre el Autor</h3>
+                <div class="flex items-center space-x-3 mb-4">
+                    <div class="h-16 w-16 rounded-full bg-chaco-green text-white flex items-center justify-center font-bold text-2xl">
+                        {{ posts.autor.username|first|upper|default:"A" }}
+                    </div>
+                    <div>
+                        <p class="font-semibold text-gray-900">{{ posts.autor|default:"Admin" }}</p>
+                        <p class="text-sm text-gray-500">Colaborador</p>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-600">Apasionado por descubrir y compartir los mejores destinos del Chaco.</p>
+            </div>
+            
+            <div class="bg-chaco-green rounded-xl shadow-lg p-6 text-white text-center">
+                <h3 class="text-lg font-bold mb-4">Descubre más contenido</h3>
+                <a href="{% url 'apps.posts:posts' %}" class="block w-full px-4 py-2 bg-white text-chaco-green font-semibold rounded-lg hover:bg-gray-100 transition-colors">
+                    Ver Todos los Posts
+                </a>
+            </div>
+        </aside>
+    </div>
+    {% if user.is_superuser or request.user|has_group:"Colaborador" %}
+    <div>
+        <a id="boton_post" href="{% url 'apps.posts:post_update' pk=posts.id %}">Modificar post</a>
+    </div>
+    <div>
+        <a id="boton_post" href="{% url 'apps.posts:post_delete' pk=posts.pk %}">Eliminar post</a>
+    </div>
+    {% endif %}
+</div>
+
+{% include 'comentario/crear_comentario.html' %}
+
+{% endblock %}

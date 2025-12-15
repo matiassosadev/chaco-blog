@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load colaborador_tags %}
+{% block contenido %}
+
+<div class="container mx-auto px-4 py-8">
+    <nav class="flex mb-8 text-sm">
+        <ol class="inline-flex items-center space-x-2">
+            <li><a href="{% url 'index' %}" class="text-gray-500 hover:text-chaco-green">Inicio</a></li>
+            <li><span class="text-gray-400">/</span></li>
+            <li class="text-gray-900 font-medium">Posts</li>
+        </ol>
+    </nav>
+    
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+        <div>
+            <h1 class="text-4xl font-bold text-gray-900 mb-2">Todos los Posts</h1>
+            <p class="text-gray-600">Explora todo el contenido de nuestro blog</p>
+        </div>
+        
+        {% if user.is_superuser or request.user|has_group:"Colaborador" %}
+        <a href="{% url 'apps.posts:crear_post' %}" class="mt-4 md:mt-0 inline-flex items-center px-6 py-3 bg-chaco-green text-white font-semibold rounded-lg hover:bg-chaco-green/90 transition-all shadow-md">
+            <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Crear Nuevo Post
+        </a>
+        {% endif %}
+    </div>
+
+    <h2>Ordenar por:</h2>
+    <ul>
+        <a id="boton_post" href="{% url 'apps.posts:posts' %}?orden=reciente">Más reciente</a>
+        <a id="boton_post" href="{% url 'apps.posts:posts' %}?orden=antiguo">Más antiguo</a>
+        <a id="boton_post" href="{% url 'apps.posts:posts' %}?orden=alfabetico">Orden alfabético</a>
+    </ul>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="lg:col-span-2">
+            {% if posts %}
+                <div class="space-y-6">
+                    {% for post in posts %}
+                    <article class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300">
+                        <div class="md:flex">
+                            <div class="md:w-64 md:flex-shrink-0 relative overflow-hidden bg-gray-200">
+                                {% if post.imagen %}
+                                <img src="{{ post.imagen.url }}" alt="{{ post.titulo }}" class="h-48 md:h-full w-full object-cover hover:scale-110 transition-transform duration-500">
+                                {% else %}
+                                <div class="h-48 md:h-full w-full bg-gradient-to-br from-chaco-green to-chaco-light flex items-center justify-center text-white text-6xl">
+                                    📍
+                                </div>
+                                {% endif %}
+                                
+                                {% if post.categoria %}
+                                <span class="absolute top-4 left-4 px-3 py-1 bg-chaco-green text-white text-xs font-semibold rounded-full">
+                                    {{ post.categoria }}
+                                </span>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="p-6 flex-1">
+                                <div class="flex items-center space-x-4 text-sm text-gray-500 mb-3">
+                                    <div class="flex items-center space-x-1">
+                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                        </svg>
+                                        <span>{{ post.fecha|date:"d M, Y" }}</span>
+                                    </div>
+                                    {% if post.autor %}
+                                    <div class="flex items-center space-x-1">
+                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                        </svg>
+                                        <span>{{ post.autor }}</span>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <h2 class="text-2xl font-bold text-gray-900 mb-2 hover:text-chaco-green transition-colors">
+                                    <a href="{% url 'apps.posts:post_individual' post.id %}">{{ post.titulo }}</a>
+                                </h2>
+                                
+                                {% if post.subtitulo %}
+                                <p class="text-gray-600 mb-4">{{ post.subtitulo }}</p>
+                                {% endif %}
+                                
+                                <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+                                    <a href="{% url 'apps.posts:post_individual' post.id %}" class="inline-flex items-center space-x-2 text-chaco-green font-semibold hover:text-chaco-green/80 transition-colors">
+                                        <span>Leer más</span>
+                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                                        </svg>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="bg-white rounded-xl shadow-lg p-12 text-center">
+                    <div class="text-6xl mb-4">📭</div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-2">No hay posts disponibles</h3>
+                    <p class="text-gray-600 mb-6">Sé el primero en compartir contenido</p>
+                    {% if user.is_superuser or request.user|has_group:"Colaborador" %}
+                    <a href="{% url 'apps.posts:crear_post' %}" class="inline-flex items-center px-6 py-3 bg-chaco-green text-white font-semibold rounded-lg hover:bg-chaco-green/90 transition-all">
+                        <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        Crear Primer Post
+                    </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <aside class="space-y-6">
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">Buscar</h3>
+                <div class="relative">
+                    <input type="search" placeholder="Buscar posts..." class="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-chaco-green focus:border-transparent">
+                    <svg class="absolute left-3 top-2.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center">
+                    <svg class="h-5 w-5 mr-2 text-chaco-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                    </svg>
+                    Categorías
+                </h3>
+                <ul class="space-y-2">
+                    <li>
+                        <a href="#" class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors group">
+                            <span class="font-medium text-gray-700 group-hover:text-chaco-green">Todas</span>
+                            <span class="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-full">{{ posts|length }}</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="bg-gradient-to-br from-chaco-green to-chaco-light rounded-xl shadow-lg p-6 text-white">
+                <h3 class="text-xl font-bold mb-2">📬 Newsletter</h3>
+                <p class="text-sm text-gray-100 mb-4">Recibe las últimas novedades</p>
+                <form class="space-y-3">
+                    <input type="email" placeholder="tu@email.com" class="w-full px-4 py-2 text-sm text-gray-900 rounded-lg focus:outline-none">
+                    <button type="submit" class="w-full px-4 py-2 bg-white text-chaco-green font-semibold text-sm rounded-lg hover:bg-gray-100 transition-colors">
+                        Suscribirme
+                    </button>
+                </form>
+            </div>
+        </aside>
+    </div>
+</div>
+{% endblock %}
