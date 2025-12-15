@@ -2,19 +2,31 @@
 
 {% block contenido %}
 
-<div>
-    <h1>Categorías</h1>
-    <br>
-    <ul>
-        {% for categoria in categorias %}
-            <li>
-                {{ categoria.nombre }}
-                (<a href="{% url 'apps.posts:categoria_delete' pk=categoria.pk %}">Eliminar</a>)
-            </li>
-        {% empty %}
-            <li>No hay categorías</li>
-        {% endfor %}
-    </ul>
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-6">Administración de Categorías</h1>
+    
+    <div class="bg-white rounded-xl shadow-lg p-6">
+        <h2 class="text-xl font-semibold mb-4">Categorías Existentes</h2>
+        
+        <ul class="space-y-3">
+            {% for categoria in categorias %}
+                <li class="flex items-center justify-between p-3 border-b last:border-b-0 hover:bg-gray-50 rounded-md">
+                    <span class="text-lg font-medium text-gray-700">{{ categoria.nombre }}</span>
+                    <a href="{% url 'apps.posts:categoria_delete' pk=categoria.pk %}" class="text-red-500 hover:text-red-700 text-sm font-semibold transition-colors">
+                        Eliminar
+                    </a>
+                </li>
+            {% empty %}
+                <li class="text-gray-500 p-3">No hay categorías para administrar.</li>
+            {% endfor %}
+        </ul>
+
+        <div class="mt-6 border-t pt-4">
+            <a href="{% url 'apps.posts:crear_categoria' %}" class="inline-flex items-center px-4 py-2 bg-chaco-green text-white font-semibold rounded-lg hover:bg-chaco-green/90 transition-all shadow-md">
+                Crear Nueva Categoría
+            </a>
+        </div>
+    </div>
 </div>
 
 {% endblock %}

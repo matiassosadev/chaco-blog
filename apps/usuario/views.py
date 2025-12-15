@@ -17,7 +17,7 @@ class RegistrarUsuario(CreateView):
     form_class = RegistroUsuarioForm
 
     def form_valid(self, form):
-        response = super().form_valid()
+        response = super().form_valid(form)
         messages.success(self.request, 'Registro exitoso. Por favor, inicia sesión')
         group = Group.objects.get(name='Registrado')
         self.object.groups.add(group)
@@ -54,21 +54,31 @@ class UsuarioDeleteView(LoginRequiredMixin, DeleteView):
     template_name = 'usuario/eliminar_usuario.html'
     success_url = reverse_lazy('apps.usuario:usuario_list')
 
+    # CORRECCIÓN 1: Devolver el contexto para que 'object' se muestre en la plantilla
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        colaborador_group = Group.objects.get(name='Colaborador')
-        es_colaborador = colaborador_group in self.object.groups.all()
-        context['es_colaborador'] = es_colaborador
-
+        try:
+            colaborador_group = Group.objects.get(name='Colaborador')
+            # self.object se obtiene automáticamente por la DeleteView
+            es_colaborador = colaborador_group in self.object.groups.all() 
+            context['es_colaborador'] = es_colaborador
+        except Group.DoesNotExist:
+             context['es_colaborador'] = False
+             
+        return context # <--- ¡SOLUCIÓN CLAVE!
+    
     def post(self, request, *args, **kwargs):
+        # CORRECCIÓN 2: Corregido el error de tipografía: 'eliminar_posts'
         eliminar_comentarios = request.POST.get('eliminar_comentarios', False)
-        eliminar_posts = request.POST.get('eiminar_posts', False)
-        self.object = self.get_object()
+        eliminar_posts = request.POST.get('eliminar_posts', False) # <--- ¡CORREGIDO!
+        
+        self.object = self.get_object() 
 
         if eliminar_comentarios:
             Comentario.objects.filter(usuario=self.object).delete()
 
         if eliminar_posts:
             Post.objects.filter(autor=self.object).delete()
+            
         messages.success(request, f'Usuario {self.object.username} eliminado correctamente')
         return self.delete(request, *args, **kwargs)

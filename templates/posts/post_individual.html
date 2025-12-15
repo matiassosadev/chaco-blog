@@ -17,6 +17,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <article class="lg:col-span-2">
             <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
+                
                 {% if posts.imagen %}
                 <div class="relative h-96 overflow-hidden">
                     <img src="{{ posts.imagen.url }}" alt="{{ posts.titulo }}" class="w-full h-full object-cover">
@@ -61,6 +62,21 @@
                                 <p class="text-sm text-gray-500">{{ posts.fecha|date:"d de F, Y" }}</p>
                             </div>
                         </div>
+                        
+                        {# Botones de Modificar/Eliminar POST (Estilizados) #}
+                        {% if user.is_superuser or request.user|has_group:"Colaborador" %}
+                        <div class="flex space-x-3">
+                            <a href="{% url 'apps.posts:post_update' pk=posts.id %}" class="inline-flex items-center px-4 py-2 border border-blue-500 text-blue-500 text-sm font-semibold rounded-lg hover:bg-blue-500 hover:text-white transition-colors">
+                                <svg class="h-4 w-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                Modificar post
+                            </a>
+                            <a href="{% url 'apps.posts:post_delete' pk=posts.pk %}" class="inline-flex items-center px-4 py-2 border border-red-500 text-red-500 text-sm font-semibold rounded-lg hover:bg-red-500 hover:text-white transition-colors">
+                                <svg class="h-4 w-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                Eliminar post
+                            </a>
+                        </div>
+                        {% endif %}
+                        
                     </div>
                 </div>
                 
@@ -91,17 +107,30 @@
                 {% if comentarios %}
                 <div class="space-y-6 mb-8">
                     {% for comentario in comentarios %}
-                    <div class="flex space-x-4 p-4 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div class="flex space-x-4 p-4 rounded-lg hover:bg-gray-50 transition-colors group">
                         <div class="flex-shrink-0">
                             <div class="h-10 w-10 rounded-full bg-gradient-to-br from-chaco-green to-chaco-light text-white flex items-center justify-center font-bold">
                                 {{ comentario.usuario.username|first|upper }}
                             </div>
                         </div>
                         <div class="flex-1">
-                            <div class="flex items-center space-x-2 mb-2">
-                                <span class="font-semibold text-gray-900">{{ comentario.usuario.username }}</span>
-                                <span class="text-gray-400">•</span>
-                                <span class="text-sm text-gray-500">{{ comentario.fecha|date:"d M, Y - H:i" }}</span>
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center space-x-2">
+                                    <span class="font-semibold text-gray-900">{{ comentario.usuario.username }}</span>
+                                    <span class="text-gray-400">•</span>
+                                    <span class="text-sm text-gray-500">{{ comentario.fecha|date:"d M, Y - H:i" }}</span>
+                                </div>
+                                
+                                {# Opciones de Modificar/Eliminar COMENTARIO, visibles al Superuser o al Autor #}
+                                {% if user.is_superuser or user == comentario.usuario %}
+                                <div class="flex space-x-2 text-sm opacity-0 group-hover:opacity-100 transition-opacity">
+                                    {# Nota: Como no tienes las URLs definidas, utilizo un marcador para que no falle el renderizado #}
+                                    <a href="#" class="text-blue-500 hover:text-blue-700 font-medium">Modificar</a>
+                                    <span class="text-gray-400">|</span>
+                                    <a href="#" class="text-red-500 hover:text-red-700 font-medium">Eliminar</a>
+                                </div>
+                                {% endif %}
+                                
                             </div>
                             <p class="text-gray-700 leading-relaxed">{{ comentario.texto }}</p>
                         </div>
@@ -115,14 +144,18 @@
                 </div>
                 {% endif %}
                 
-                <div id="comentario" class="border-t border-gray-200 pt-8">
+                <div id="comentario_form" class="border-t border-gray-200 pt-8">
                     {% if user.is_authenticated %}
                     <h3 class="text-xl font-bold text-gray-900 mb-4">Deja tu comentario</h3>
                     <form method="POST" class="space-y-4">
                         {% csrf_token %}
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Tu comentario</label>
-                            <textarea name="texto" rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-chaco-green focus:border-transparent resize-none" placeholder="Comparte tu opinión..." required></textarea>
+                            {# Renderizado manual para aplicar estilos Tailwind y evitar la etiqueta "Texto:" #}
+                            <label for="id_texto" class="sr-only">Tu comentario</label>
+                            {% if form.texto.errors %}
+                                <div class="text-red-500 text-sm mb-1">{{ form.texto.errors }}</div>
+                            {% endif %}
+                            <textarea name="texto" id="id_texto" rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-chaco-green focus:border-transparent resize-none" placeholder="Comparte tu opinión..." required>{{ form.texto.value|default:"" }}</textarea>
                         </div>
                         <div class="flex items-center justify-between">
                             <p class="text-sm text-gray-500">Comentando como <span class="font-semibold text-chaco-green">{{ user.username }}</span></p>
@@ -137,7 +170,7 @@
                         <h3 class="text-xl font-bold text-gray-900 mb-2">Inicia sesión para comentar</h3>
                         <p class="text-gray-600 mb-6">Debes estar registrado para dejar un comentario</p>
                         <div class="flex items-center justify-center space-x-3">
-                            <a href="{% url 'apps.usuario:login' %}?next={{ request.path }}#comentario" class="px-6 py-3 bg-chaco-green text-white font-semibold rounded-lg hover:bg-chaco-green/90 transition-all">
+                            <a href="{% url 'apps.usuario:login' %}?next={{ request.path }}#comentario_form" class="px-6 py-3 bg-chaco-green text-white font-semibold rounded-lg hover:bg-chaco-green/90 transition-all">
                                 Iniciar Sesión
                             </a>
                             <a href="{% url 'apps.usuario:registrar' %}" class="px-6 py-3 border-2 border-chaco-green text-chaco-green font-semibold rounded-lg hover:bg-chaco-green hover:text-white transition-all">
@@ -173,16 +206,8 @@
             </div>
         </aside>
     </div>
-    {% if user.is_superuser or request.user|has_group:"Colaborador" %}
-    <div>
-        <a id="boton_post" href="{% url 'apps.posts:post_update' pk=posts.id %}">Modificar post</a>
-    </div>
-    <div>
-        <a id="boton_post" href="{% url 'apps.posts:post_delete' pk=posts.pk %}">Eliminar post</a>
-    </div>
-    {% endif %}
 </div>
 
-{% include 'comentario/crear_comentario.html' %}
+{# ELIMINADO: Se quitó el {% include 'comentario/crear_comentario.html' %} para evitar duplicidad #}
 
 {% endblock %}

@@ -1,14 +1,14 @@
 from django.shortcuts import redirect, render
-from .models import Post, Comentario, Categoria
+from .models import Post, Comentario, Categoria 
 from django.views.generic import ListView, DetailView, CreateView, DeleteView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import ComentarioForm, CrearPostForm, NuevaCategoriaForm
 from django.urls import reverse_lazy, reverse
 from django.contrib import messages
 
-# Vista para el index (agregá esta)
+# Vista para el index
 def index(request):
-    posts = Post.objects.all().order_by('-fecha')[:3]  # Últimos 3 posts
+    posts = Post.objects.all().order_by('-fecha')[:3] 
     return render(request, 'index.html', {'posts': posts})
 
 class PostListView(ListView):
@@ -30,6 +30,8 @@ class PostListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['orden'] = self.request.GET.get('orden', 'reciente')
+        # ✅ Corrección para enviar la lista de categorías
+        context['categorias'] = Categoria.objects.all() 
         return context
 
 class PostDetailView(DetailView):
@@ -45,7 +47,7 @@ class PostDetailView(DetailView):
         context['comentarios'] = Comentario.objects.filter(posts_id=self.kwargs['id']).order_by('-fecha')
         return context
 
-    def post(self, request, *args, **kwargs):            
+    def post(self, request, *args, **kwargs): 
         form = ComentarioForm(request.POST)
         if form.is_valid():
             comentario = form.save(commit=False)
