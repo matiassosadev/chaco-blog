@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 import os
 from pathlib import Path
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = ''
+SECRET_KEY = config('SECRET_KEY', default='django-insecure-ax!6pjgg-_$b^mr%i6zs7uieh9loief)4_s0%h=vzj6jz4z*+v')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
@@ -28,10 +29,10 @@ AUTH_USER_MODEL = 'usuario.Usuario'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = '587'
+EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
 EMAIL_USE_TLS = True
-EMAIL_HOST_USSER = 'matiassosadev@gmail.com'
-EMAIL_HOST_PASSWORD = 'contraseña de mail'
+EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='matiassosadev@gmail.com')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 
 SITE_NAME = 'Chaco - Blog'
 
@@ -44,7 +45,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
     'apps.posts',
     'apps.contacto',
     'apps.usuario'

@@ -54,23 +54,21 @@ class UsuarioDeleteView(LoginRequiredMixin, DeleteView):
     template_name = 'usuario/eliminar_usuario.html'
     success_url = reverse_lazy('apps.usuario:usuario_list')
 
-    # CORRECCIÓN 1: Devolver el contexto para que 'object' se muestre en la plantilla
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         try:
             colaborador_group = Group.objects.get(name='Colaborador')
-            # self.object se obtiene automáticamente por la DeleteView
             es_colaborador = colaborador_group in self.object.groups.all() 
             context['es_colaborador'] = es_colaborador
         except Group.DoesNotExist:
              context['es_colaborador'] = False
              
-        return context # <--- ¡SOLUCIÓN CLAVE!
+        return context
     
     def post(self, request, *args, **kwargs):
-        # CORRECCIÓN 2: Corregido el error de tipografía: 'eliminar_posts'
+
         eliminar_comentarios = request.POST.get('eliminar_comentarios', False)
-        eliminar_posts = request.POST.get('eliminar_posts', False) # <--- ¡CORREGIDO!
+        eliminar_posts = request.POST.get('eliminar_posts', False)
         
         self.object = self.get_object() 
 

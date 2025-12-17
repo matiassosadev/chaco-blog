@@ -6,7 +6,6 @@ from .forms import ComentarioForm, CrearPostForm, NuevaCategoriaForm
 from django.urls import reverse_lazy, reverse
 from django.contrib import messages
 
-# Vista para el index
 def index(request):
     posts = Post.objects.all().order_by('-fecha')[:3] 
     return render(request, 'index.html', {'posts': posts})
@@ -30,7 +29,6 @@ class PostListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['orden'] = self.request.GET.get('orden', 'reciente')
-        # ✅ Corrección para enviar la lista de categorías
         context['categorias'] = Categoria.objects.all() 
         return context
 
@@ -78,7 +76,7 @@ class PostCreateView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy('apps.posts:posts')
     
     def form_valid(self, form):
-        form.instance.autor = self.request.user  # Asignar el usuario como autor
+        form.instance.autor = self.request.user
         messages.success(self.request, '¡Post creado exitosamente!')
         return super().form_valid(form)
     
