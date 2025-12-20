@@ -10,7 +10,7 @@
         <ul>
             <p>{{ comentario.texto }}</p>
             {% if user.is_superuser or comentario.usuario == user %}
-                <br><a id="boton_post" href="{% url 'apps.posts:comentario_eliminar' pk=comentario.pk % }">Eliminar</a>
+                <br><a id="boton_post" href="{% url 'apps.posts:comentario_eliminar' pk=comentario.pk %}">Eliminar</a>
             {% endif %}
             {% if user.is_superuser or comentario.usuario == user or request.user|has_group:"Colaborador" %}
                 <br><a id="boton_post" href="{% url 'apps.posts:comentario_eliminar' pk=comentario.pk %}">Eliminar</a>

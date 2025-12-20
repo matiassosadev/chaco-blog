@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Acerca de - Blog Chaco{% endblock %}
+
+{% block contenido %}
+<div class="container mx-auto px-4 py-16 max-w-4xl">
+    <div class="text-center mb-12">
+        <h1 class="text-4xl font-bold text-chaco-green mb-4">Sobre Chaco Blog</h1>
+        <div class="h-1 w-24 bg-chaco-light mx-auto rounded-full"></div>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-xl p-8 md:p-12 border border-gray-100 leading-relaxed text-gray-700 space-y-10">
+        
+        <section>
+            <h2 class="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                <span class="bg-chaco-green/10 text-chaco-green p-3 rounded-xl mr-4">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                </span>
+                Nuestra Misión
+            </h2>
+            <p class="text-lg">
+                Este blog nació con el objetivo de difundir la cultura, el turismo y la actualidad de nuestra provincia. 
+                Buscamos ser un espacio de interacción donde los usuarios puedan informarse y participar activamente 
+                comentando las noticias y relatos de la región.
+            </p>
+        </section>
+
+        <section class="border-t border-gray-100 pt-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                <span class="bg-chaco-green/10 text-chaco-green p-3 rounded-xl mr-4">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                </span>
+                El Equipo
+            </h2>
+            <p class="text-lg">
+                Somos un grupo de desarrolladores del <strong>Informatorio Chaco 2025</strong> apasionados por la tecnología y nuestra tierra. 
+                Este proyecto representa la culminación de meses de aprendizaje en el desarrollo web con Django y Python.
+            </p>
+        </section>
+
+        <div class="text-center pt-6">
+            <a href="{% url 'apps.contacto:contacto' %}" class="inline-block bg-chaco-green hover:bg-chaco-light text-white font-bold py-4 px-10 rounded-2xl transition duration-300 shadow-lg transform hover:-translate-y-1">
+                ¿Tenés dudas? Contactanos
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

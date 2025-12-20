@@ -1,6 +1,6 @@
 from .forms import ContactoForm
 from django.contrib import messages
-from django.views.generic import CreateView
+from django.views.generic import CreateView, TemplateView
 from django.urls import reverse_lazy
 
 class ContactoUsuario(CreateView):
@@ -16,3 +16,6 @@ class ContactoUsuario(CreateView):
     def form_valid(self, form):
         messages.success(self.request, 'Consulta enviada.')
         return super().form_valid(form)
+    
+class AcercaDeView(TemplateView):
+    template_name = 'contacto/acerca_de.html'
